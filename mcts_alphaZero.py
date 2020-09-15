@@ -210,7 +210,9 @@ class MCTSPlayer(object):
             else:
                 # with the default temp=1e-3, it is almost equivalent
                 # to choosing the move with the highest prob
-                move = np.random.choice(acts, p=probs)
+                index_move = np.random.choice(len(acts), p=probs)
+                move = acts[index_move]
+
                 # reset the root node
                 self.mcts.update_with_move(-1)
                 # NNのパラメタが固定されてからはノード展開しないから-1

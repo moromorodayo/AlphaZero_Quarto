@@ -13,16 +13,20 @@ from operator import itemgetter
 def rollout_policy_fn(board):
     """a coarse, fast version of policy_fn used in the rollout phase."""
     # rollout randomly
-    action_probs = np.random.rand(len(board.availables))
-    return zip(board.availables, action_probs)
+    action_probs = np.random.rand(len(board.availables_field) * len(board.availables_koma_int))
+    available_move = [(i,j) for j in board.availables_koma_int for i in board.availables_field]
+
+    return zip(available_move, action_probs)
 
 
 def policy_value_fn(board):
     """a function that takes in a state and outputs a list of (action, probability)
     tuples and a score for the state"""
     # return uniform probabilities and 0 score for pure MCTS
-    action_probs = np.ones(len(board.availables))/len(board.availables)
-    return zip(board.availables, action_probs), 0
+    action_probs = np.ones(len(board.availables_field)*len(board.availables_koma_int))/len(board.availables_field)/len(board.availables_koma_int)
+    available_move = [(i,j) for j in board.availables_koma_int for i in board.availables_field]
+
+    return zip(available_move, action_probs), 0
 
 
 class TreeNode(object):
@@ -193,8 +197,11 @@ class MCTSPlayer(object):
     def reset_player(self):
         self.mcts.update_with_move(-1)
 
+    def initiate_koma(self,board):
+        return 0
+
     def get_action(self, board):
-        sensible_moves = board.availables
+        sensible_moves = board.availables_field
         if len(sensible_moves) > 0:
             move = self.mcts.get_move(board)
             self.mcts.update_with_move(-1)
