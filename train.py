@@ -8,6 +8,7 @@ An implementation of the training pipeline of AlphaZero for Gomoku
 from __future__ import print_function
 import random
 import numpy as np
+import torch
 from collections import defaultdict, deque
 from game import Board, Game
 from mcts_pure import MCTSPlayer as MCTS_Pure
@@ -102,7 +103,11 @@ class TrainPipeline():
         mcts_probs_batch = [data[1] for data in mini_batch]
         winner_batch = [data[2] for data in mini_batch]
         old_probs,old_koma_probs, old_v = self.policy_value_net.policy_value(state_batch)
-        old_united_probs = [field*koma for field in old_probs for koma in old_koma_probs]
+        
+        tmp1 = torch.cat([torch.from_numpy(old_probs).unsqueeze(2) for _ in range(len(old_koma_probs[0]))], dim=2)
+        tmp2 = torch.cat([torch.from_numpy(old_koma_probs).unsqueeze(1) for _ in range(len(old_probs[0]))], dim=1)
+        old_united_probs = torch.reshape(tmp1 * tmp2,(self.batch_size,-1)).to('cpu').detach().numpy()
+        
         for i in range(self.epochs):
             loss, entropy = self.policy_value_net.train_step(
                     state_batch,
@@ -110,9 +115,14 @@ class TrainPipeline():
                     winner_batch,
                     self.learn_rate*self.lr_multiplier)
             new_probs,new_koma_probs, new_v = self.policy_value_net.policy_value(state_batch)
-            new_united_probs = [field*koma for field in new_probs for koma in new_koma_probs]
+            
+            tmp3 = torch.cat([torch.from_numpy(new_probs).unsqueeze(2) for _ in range(len(new_koma_probs[0]))], dim=2)
+            tmp4 = torch.cat([torch.from_numpy(new_koma_probs).unsqueeze(1) for _ in range(len(new_probs[0]))], dim=1)
+            new_united_probs = torch.reshape(tmp3 * tmp4,(self.batch_size,-1)).to('cpu').detach().numpy()
+            
             kl = np.mean(np.sum(old_united_probs * (
-                    np.log(old_united_probs + 1e-10) - np.log(new_united_probs + 1e-10)),
+                    np.log(old_united_probs + 1e-10) -
+                    np.log(new_united_probs + 1e-10)),
                     axis=1)
             )
             if kl > self.kl_targ * 4:  # early stopping if D_KL diverges badly

@@ -158,7 +158,18 @@ class PolicyValueNet():
 
         # forward
         log_act_probs, log_koma_probs, value = self.policy_value_net(state_batch)
-        log_united_probs = [log_act_prob + log_koma_prob for log_act_prob in log_act_probs for log_koma_prob in log_koma_probs]
+
+        #tmp1 = torch.zeros(len(state_batch), len(log_act_probs), len(log_koma_probs))
+        # tmp2 = torch.zeros(len(state_batch), len(log_koma_probs),len(log_act_probs))
+        tmp1 = torch.cat([log_act_probs.unsqueeze(2) for _ in range(len(log_koma_probs[0]))], dim=2)
+        tmp2 = torch.cat([log_koma_probs.unsqueeze(1) for _ in range(len(log_act_probs[0]))], dim=1)
+        #tmp1[:,:] = log_koma_probs
+        #tmp2[:,:] = log_act_probs
+        #log_united_probs = torch.reshape(tmp1 + tmp2.permute(0,2,1),(len(state_batch),-1))
+        log_united_probs = torch.reshape(tmp1 + tmp2,(len(state_batch),-1))
+
+        #torch.bmm(torch.unsqueeze(log_act_probs, 2), torch.unsqueeze(log_koma_probs, 1))
+        # log_united_probs = [log_act_prob + log_koma_prob for log_act_prob in log_act_probs for log_koma_prob in log_koma_probs]
         # define the loss = (z - v)^2 - pi^T * log(p) + c||theta||^2
         # Note: the L2 penalty is incorporated in optimizer
         value_loss = F.mse_loss(value.view(-1), winner_batch)
