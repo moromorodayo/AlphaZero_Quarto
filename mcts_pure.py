@@ -128,7 +128,9 @@ class MCTS(object):
             # Greedily select next move.
             action, node = node.select(self._c_puct)
             state.do_move(action)
-
+            if len(state.availables_field) == 1 and len(state.availables_koma_int) == 0:
+                state.do_last_move()
+                
         action_probs, _ = self._policy(state)
         # Check for end of game
         end, winner = state.game_end()
@@ -152,6 +154,9 @@ class MCTS(object):
             action_probs = rollout_policy_fn(state)
             max_action = max(action_probs, key=itemgetter(1))[0]
             state.do_move(max_action)
+
+            if len(state.availables_field) == 1 and len(state.availables_koma_int) == 0:
+                state.do_last_move()
         else:
             # If no break from the loop, issue a warning.
             print("WARNING: rollout reached move limit")

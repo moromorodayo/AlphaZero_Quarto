@@ -116,6 +116,8 @@ class MCTS(object):
             # Greedily select next move.
             move, node = node.select(self._c_puct)
             state.do_move(move)
+            if len(state.availables_field) == 1 and len(state.availables_koma_int) == 0:
+                state.do_last_move()
 
         # Evaluate the leaf using a network which outputs a list of
         # (action, probability) tuples p and also a score v in [-1, 1]
@@ -189,6 +191,7 @@ class MCTSPlayer(object):
 
     def get_action(self, board, temp=1e-3, return_prob=0):
         sensible_moves = board.availables_field
+        assert len(sensible_moves) > 1
         # the pi vector returned by MCTS as in the alphaGo Zero paper
         move_probs = np.zeros(board.width*board.height*16)
         if len(sensible_moves) > 0:
