@@ -129,6 +129,7 @@ class Board(object):
         assert len(self.availables_field) == 1 and len(self.availables_koma_int) == 0
         last_field = self.availables_field[0]
         self.states[last_field] = self.kept_koma_int
+        self.availables_field.remove(last_field)
         self.last_move = (last_field, -1)
         self.kept_koma_int = -1
 
