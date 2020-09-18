@@ -42,7 +42,7 @@ class TrainPipeline():
         self.play_batch_size = 1
         self.epochs = 5  # num of train_steps for each update
         self.kl_targ = 0.02
-        self.check_freq = 5
+        self.check_freq = 50
         self.game_batch_num = 2500
         #self.game_batch_num = 4
         self.best_win_ratio = 0.0
