@@ -87,7 +87,7 @@ class Board(object):
         state shape: 4*width*height*4
         """
         #ここだけkoma_oneを使う。
-        square_state = np.zeros((7, self.width, self.height))
+        square_state = np.zeros((10, self.width, self.height))
         if self.states:
             where_to_put, koma_ints = np.array(list(zip(*self.states.items())))
             for i in range(len(where_to_put)):
@@ -102,12 +102,22 @@ class Board(object):
                                 int(where_to_put[i] % self.height)] = koma_one[3]
                             
             # indicate the last move location
+            koma_last_one = self.koma_int_to_koma_one(self.last_move[1])
             square_state[4][int(self.last_move[0] // self.width),
-                                int(self.last_move[0] % self.height)] = self.last_move[1]
+                                int(self.last_move[0] % self.height)] = koma_last_one[0]
+            square_state[5][int(self.last_move[0] // self.width),
+                                int(self.last_move[0] % self.height)] = koma_last_one[1]
+            square_state[6][int(self.last_move[0] // self.width),
+                                int(self.last_move[0] % self.height)] = koma_last_one[2]
+            square_state[7][int(self.last_move[0] // self.width),
+                                int(self.last_move[0] % self.height)] = koma_last_one[3]
 
-            square_state[5][:] = self.koma_int_to_koma_one(self.kept_koma_int)
-            if len(self.states) % 2 == 0:
-                square_state[6][:,:] = [1,1,1,1]  # indicate the colour to play
+            square_state[8][:] = self.koma_int_to_koma_one(self.kept_koma_int)
+            if len(self.states) % 2 == 0: # indicate the colour to play
+                square_state[9][:,:] = [1, 1, 1, 1]
+            else:
+                square_state[9][:,:] = [-1, -1, -1, -1]
+
         # TODO -1の意味を理解する
         return square_state[:, ::-1, :]
     

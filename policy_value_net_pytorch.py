@@ -29,7 +29,7 @@ class Net(nn.Module):
         self.board_height = board_height
         # common layers
         # 第一引数は入力層のdim= 0と一致
-        self.conv1 = nn.Conv2d(7, 32, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(10, 32, kernel_size=3, padding=1)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
         self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
         # action policy layers
@@ -121,7 +121,7 @@ class PolicyValueNet():
         #一致していなかった。
         legal_koma_positions = board.availables_koma_int
         current_state = np.ascontiguousarray(board.current_state().reshape(
-                -1, 7, self.board_width, self.board_height))
+                -1, 10, self.board_width, self.board_height))
         if self.use_gpu:
             log_act_probs,log_koma_probs, value = self.policy_value_net(
                     Variable(torch.from_numpy(current_state)).cuda().float())
