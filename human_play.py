@@ -11,9 +11,10 @@ import pickle
 from game import Board, Game
 from mcts_pure import MCTSPlayer as MCTS_Pure
 from mcts_alphaZero import MCTSPlayer
-from policy_value_net_numpy import PolicyValueNetNumpy
+from collections import defaultdict
+#from policy_value_net_numpy import PolicyValueNetNumpy
 # from policy_value_net import PolicyValueNet  # Theano and Lasagne
-# from policy_value_net_pytorch import PolicyValueNet  # Pytorch
+from policy_value_net_pytorch import PolicyValueNet  # Pytorch
 # from policy_value_net_tensorflow import PolicyValueNet # Tensorflow
 # from policy_value_net_keras import PolicyValueNet  # Keras
 
@@ -67,7 +68,7 @@ class Human(object):
         return "Human {}".format(self.player)
 
 
-def run():
+def run_human_vs_human():
     n = 4
     width, height = 4, 4
     try:
@@ -83,10 +84,10 @@ def run():
     except KeyboardInterrupt:
         print('\n\rquit')
 
-def run2():
+def run_human_vs_mcts():
     n = 4
     width, height = 4, 4
-    model_file = 'best_policy_8_8_5.model'
+    model_file = 'best_policy?super.model'
     try:
         board = Board(width=width, height=height, n_in_row=n)
         game = Game(board)
@@ -98,12 +99,7 @@ def run2():
         # mcts_player = MCTSPlayer(best_policy.policy_value_fn, c_puct=5, n_playout=400)
 
         # load the provided model (trained in Theano/Lasagne) into a MCTS player written in pure numpy
-        try:
-            policy_param = pickle.load(open(model_file, 'rb'))
-        except:
-            policy_param = pickle.load(open(model_file, 'rb'),
-                                       encoding='bytes')  # To support python3
-        best_policy = PolicyValueNetNumpy(width, height, policy_param)
+        best_policy = PolicyValueNet(width, height, model_file)
         mcts_player = MCTSPlayer(best_policy.policy_value_fn,
                                  c_puct=5,
                                  n_playout=400)  # set larger n_playout for better performance
@@ -121,4 +117,4 @@ def run2():
 
 
 if __name__ == '__main__':
-    run()
+    run_human_vs_mcts()

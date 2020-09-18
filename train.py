@@ -18,6 +18,7 @@ from policy_value_net_pytorch import PolicyValueNet  # Pytorch
 # from policy_value_net_tensorflow import PolicyValueNet # Tensorflow
 # from policy_value_net_keras import PolicyValueNet # Keras
 
+from torch.utils.tensorboard import SummaryWriter
 
 class TrainPipeline():
     def __init__(self, init_model=None):
@@ -185,6 +186,9 @@ class TrainPipeline():
                         i+1, self.episode_len))
                 if len(self.data_buffer) > self.batch_size:
                     loss, entropy = self.policy_update()
+                    
+                    #google colaboratoryのときはコメントアウトする。
+    #               writer.add_scalar("loss", loss, i)
                 # check the performance of the current model,
                 # and save the model params
                 if (i+1) % self.check_freq == 0:
@@ -202,8 +206,12 @@ class TrainPipeline():
                             self.best_win_ratio = 0.0
         except KeyboardInterrupt:
             print('\n\rquit')
+        
+        #writer.close()
 
 
 if __name__ == '__main__':
+    #google colaboratoryのときはコメントアウトする。
+    #writer = SummaryWriter(log_dir="./logs")
     training_pipeline = TrainPipeline()
     training_pipeline.run()

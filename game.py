@@ -71,7 +71,8 @@ class Board(object):
         if len(tmp_arr) < 4:
             for i in range(len(tmp_arr)):
                 return_arr[4 - len(tmp_arr) + i] = tmp_arr[i]
-        return return_arr  
+            return return_arr
+        return tmp_arr  
 
     def koma_one_to_koma_int(self, koma_one):
         if koma_one == -1 or koma_one == [0,0,0,0]:
@@ -91,18 +92,18 @@ class Board(object):
             where_to_put, koma_ints = np.array(list(zip(*self.states.items())))
             for i in range(len(where_to_put)):
                 koma_one = self.koma_int_to_koma_one(koma_ints[i])
-                square_state[0][where_to_put[i] // self.width,
-                                where_to_put[i] % self.height] = koma_one[0]
-                square_state[1][where_to_put[i] // self.width,
-                                where_to_put[i] % self.height] = koma_one[1]
-                square_state[2][where_to_put[i] // self.width,
-                                where_to_put[i] % self.height] = koma_one[2]
-                square_state[3][where_to_put[i] // self.width,
-                                where_to_put[i] % self.height] = koma_one[3]
+                square_state[0][int(where_to_put[i] // self.width),
+                                int(where_to_put[i] % self.height)] = koma_one[0]
+                square_state[1][int(where_to_put[i] // self.width),
+                                int(where_to_put[i] % self.height)] = koma_one[1]
+                square_state[2][int(where_to_put[i] // self.width),
+                                int(where_to_put[i] % self.height)] = koma_one[2]
+                square_state[3][int(where_to_put[i] // self.width),
+                                int(where_to_put[i] % self.height)] = koma_one[3]
                             
             # indicate the last move location
-            square_state[4][self.last_move[0] // self.width,
-                                self.last_move[0] % self.height] = self.last_move[1]
+            square_state[4][int(self.last_move[0] // self.width),
+                                int(self.last_move[0] % self.height)] = self.last_move[1]
 
             square_state[5][:] = self.koma_int_to_koma_one(self.kept_koma_int)
             if len(self.states) % 2 == 0:
