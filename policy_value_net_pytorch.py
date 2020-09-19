@@ -71,7 +71,7 @@ class Net(nn.Module):
         x_val = torch.tanh(self.val_fc2(x_val))
         # action koma layers
         x_koma = F.relu(self.koma_conv1(x))
-        x_koma = x_koma.view(-1, 2*self.board_width*self.board_height)
+        x_koma = x_koma.view(-1, 64*self.board_width*self.board_height)
         x_koma = F.relu(self.koma_fc1(x_koma))
         x_koma = F.relu(self.koma_fc2(x_koma))
         x_koma = F.log_softmax(self.koma_fc3(x_koma),dim=1)
