@@ -44,9 +44,8 @@ class Net(nn.Module):
 
         # action koma layers
         self.koma_conv1 = nn.Conv2d(128, 64, kernel_size=1)
-        self.koma_fc1 = nn.Linear(64*board_width*board_height, 8*board_width*board_height)
-        self.koma_fc2 = nn.Linear(8*board_width*board_height, 64)
-        self.koma_fc3 = nn.Linear(64, 16)
+        self.koma_fc1 = nn.Linear(64*board_width*board_height, 64)
+        self.koma_fc2 = nn.Linear(64, 16)
         
 
     def forward(self, state_input):
@@ -73,8 +72,7 @@ class Net(nn.Module):
         x_koma = F.relu(self.koma_conv1(x))
         x_koma = x_koma.view(-1, 64*self.board_width*self.board_height)
         x_koma = F.relu(self.koma_fc1(x_koma))
-        x_koma = F.relu(self.koma_fc2(x_koma))
-        x_koma = F.log_softmax(self.koma_fc3(x_koma),dim=1)
+        x_koma = F.log_softmax(self.koma_fc2(x_koma),dim=1)
         return x_act, x_koma, x_val
 
 
