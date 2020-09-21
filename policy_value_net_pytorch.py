@@ -29,10 +29,11 @@ class Net(nn.Module):
         self.board_height = board_height
         # common layers
         # 第一引数は入力層のdim= 0と一致
-        self.conv1 = nn.Conv2d(10, 20, kernel_size=3, padding=1)
-        self.conv2 = nn.Conv2d(20, 32, kernel_size=3, padding=1)
-        self.conv3 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
-        self.conv4 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(10, 32, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
+        self.conv3 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
+        self.conv4 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.conv5 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
         # action policy layers
         self.act_conv1 = nn.Conv2d(128, 4, kernel_size=1)
         self.act_fc1 = nn.Linear(4*board_width*board_height,
@@ -44,9 +45,8 @@ class Net(nn.Module):
 
         # action koma layers
         self.koma_conv1 = nn.Conv2d(128, 64, kernel_size=1)
-        self.koma_fc1 = nn.Linear(64*board_width*board_height, 8*board_width*board_height)
-        self.koma_fc2 = nn.Linear(8*board_width*board_height, 64)
-        self.koma_fc3 = nn.Linear(64, 16)
+        self.koma_fc1 = nn.Linear(64*board_width*board_height, 64)
+        self.koma_fc2 = nn.Linear(64, 16)
         
 
     def forward(self, state_input):
@@ -57,7 +57,8 @@ class Net(nn.Module):
         x = F.relu(self.conv2(x))
         x = F.relu(self.conv3(x))
         x = F.relu(self.conv4(x))
-        
+        x = F.relu(self.conv5(x))
+
         # action policy layers
         x_act = F.relu(self.act_conv1(x))
         # ここの4も入力層のdim= 0と一致
@@ -73,8 +74,7 @@ class Net(nn.Module):
         x_koma = F.relu(self.koma_conv1(x))
         x_koma = x_koma.view(-1, 64*self.board_width*self.board_height)
         x_koma = F.relu(self.koma_fc1(x_koma))
-        x_koma = F.relu(self.koma_fc2(x_koma))
-        x_koma = F.log_softmax(self.koma_fc3(x_koma),dim=1)
+        x_koma = F.log_softmax(self.koma_fc2(x_koma),dim=1)
         return x_act, x_koma, x_val
 
 

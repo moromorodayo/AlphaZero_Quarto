@@ -36,14 +36,14 @@ class TrainPipeline():
         self.temp = 1.0  # the temperature param
         self.n_playout = 400  # num of simulations for each move
         self.c_puct = 5
-        self.buffer_size = 10000
-        self.batch_size = 512  # mini-batch size for training
+        self.buffer_size = 20000
+        self.batch_size = 1024  # mini-batch size for training
         self.data_buffer = deque(maxlen=self.buffer_size)
         self.play_batch_size = 1
         self.epochs = 5  # num of train_steps for each update
         self.kl_targ = 0.02
         self.check_freq = 50
-        self.game_batch_num = 2500
+        self.game_batch_num = 4000
         #self.game_batch_num = 4
         self.best_win_ratio = 0.0
         # num of simulations used for the pure mcts, which is used as
@@ -188,7 +188,7 @@ class TrainPipeline():
                     loss, entropy = self.policy_update()
                     
                     #google colaboratoryのときはコメントアウトする。
-    #               writer.add_scalar("loss", loss, i)
+                    writer.add_scalar("loss", loss, i)
                 # check the performance of the current model,
                 # and save the model params
                 if (i+1) % self.check_freq == 0:
@@ -207,11 +207,13 @@ class TrainPipeline():
         except KeyboardInterrupt:
             print('\n\rquit')
         
-        #writer.close()
+        #google colaboratoryのときはコメントアウトする。
+    
+        writer.close()
 
 
 if __name__ == '__main__':
     #google colaboratoryのときはコメントアウトする。
-    #writer = SummaryWriter(log_dir="./logs")
+    writer = SummaryWriter(log_dir="./logs")
     training_pipeline = TrainPipeline()
     training_pipeline.run()
