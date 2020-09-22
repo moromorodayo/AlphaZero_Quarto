@@ -152,7 +152,7 @@ class TrainPipeline():
                         entropy,
                         explained_var_old,
                         explained_var_new))
-        return loss, entropy
+        return loss, entropy , explained_var_old, explained_var_new
 
     def policy_evaluate(self, n_games=10):
         """
@@ -185,10 +185,13 @@ class TrainPipeline():
                 print("batch i:{}, episode_len:{}".format(
                         i+1, self.episode_len))
                 if len(self.data_buffer) > self.batch_size:
-                    loss, entropy = self.policy_update()
-                    
+                    loss, entropy,explained_var_old,explained_var_new = self.policy_update()
+                    writer.add_scalar('loss', loss,i)
+                    writer.add_scalar('entropy', entropy,i)
+                    writer.add_scalar("explained_var_old", explained_var_old,i)
+                    writer.add_scalar('explained_var_new', explained_var_new,i)
                     #google colaboratoryのときはコメントアウトする。
-    #               writer.add_scalar("loss", loss, i)
+                    
                 # check the performance of the current model,
                 # and save the model params
                 if (i+1) % self.check_freq == 0:
@@ -207,11 +210,13 @@ class TrainPipeline():
         except KeyboardInterrupt:
             print('\n\rquit')
         
-        #writer.close()
+        #google colaboratoryのときはコメントアウトする。
+    
+        writer.close()
 
 
 if __name__ == '__main__':
     #google colaboratoryのときはコメントアウトする。
-    #writer = SummaryWriter(log_dir="./logs")
+    writer = SummaryWriter(log_dir="./logs/local")
     training_pipeline = TrainPipeline()
     training_pipeline.run()
